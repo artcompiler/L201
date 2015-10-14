@@ -317,13 +317,13 @@ let translate = (function() {
     console.log("pool=" + JSON.stringify(pool, null, 2));
     nodePool = pool;
     return visit(pool.root, {}, resume);
-  }
+  };
   function error(str, nid) {
     return {
       str: str,
       nid: nid,
     };
-  }
+  };
   function visit(nid, options, resume) {
     assert(typeof resume === "function", message(1003));
     // Get the node from the pool of nodes.
@@ -332,25 +332,25 @@ let translate = (function() {
     assert(node.tag, message(1001, [nid]));
     assert(typeof table[node.tag] === "function", message(1004, [node.tag]));
     return table[node.tag](node, options, resume);
-  }
+  };
   // BEGIN VISITOR METHODS
   let edgesNode;
   function str(node, options, resume) {
     let val = node.elts[0];
     resume([], val);
-  }
+  };
   function num(node, options, resume) {
     let val = node.elts[0];
     resume([], val);
-  }
+  };
   function ident(node, options, resume) {
     let val = node.elts[0];
     resume([], val);
-  }
+  };
   function bool(node, options, resume) {
     let val = node.elts[0];
     resume([], val);
-  }
+  };
   function add(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       val1 = +val1;
@@ -394,27 +394,27 @@ let translate = (function() {
    });
   };
   function get(node, options, resume) {
-  	visit(node.elts[0], options, function (err, val) {
-  		if(typeof val === 'string'){
-  			https.get(val, function(res) {
-  				var obj = '';
+    visit(node.elts[0], options, function (err, val) {
+      if(typeof val === 'string'){
+        https.get(val, function(res) {
+          var obj = '';
 
-  				res.on('data', function(d) {
-  					obj += d;
-  				});
+          res.on('data', function(d) {
+            obj += d;
+          });
 
-  				res.on('end', function() {
-  					resume([].concat(err), obj);
-  				})
-  			}).on('error', function(e) {
-  				err = err.concat(error("Invalid URL.", node.elts[0]));
-  				resume([].concat(err), val);
-  			})
-  		} else {
-  			err = err.concat(error("Argument is not a valid string.", node.elts[0]));
-  			resume([].concat(err), val);
-  		}
-  	});
+          res.on('end', function() {
+            resume([].concat(err), obj);
+          })
+        }).on('error', function(e) {
+          err = err.concat(error("Invalid URL.", node.elts[0]));
+          resume([].concat(err), val);
+        })
+      } else {
+        err = err.concat(error("Argument is not a valid string.", node.elts[0]));
+        resume([].concat(err), val);
+      }
+    });
   };
   function data(node, options, resume) {//one value: an object or array thereof
     visit(node.elts[0], options, function (err, val) {
@@ -442,10 +442,10 @@ let translate = (function() {
         text: ["%percent"],
       };
       if(typeof val === "string"){
-      	val = JSON.parse(val);
-      	if(val.error && val.error.length > 0) {
-      		err = err.concat(error("Attempt to parse input returned " + val.error, node.elts[0]));
-      	}
+        val = JSON.parse(val);
+        if(val.error && val.error.length > 0) {
+          err = err.concat(error("Attempt to parse input returned " + val.error, node.elts[0]));
+        }
       }
       if(!(val instanceof Array) || !val.length ){
         err = err.concat(error("Invalid parameters.", node.elts[0]));
@@ -477,17 +477,17 @@ let translate = (function() {
             }
           });
         } else if(typeof val[0] === "object"){//parsed array.
-        	val.forEach(function (element, index, array) {
-        		if(element.goal && element.value){
+          val.forEach(function (element, index, array) {
+            if(element.goal && element.value){
               var d = decprog(element.goal, element.value);
               ret.goal = ret.goal.concat(+d.goal);
               ret.current = ret.current.concat(+d.value);
               ret.progress = ret.progress.concat(d.progress);
               ret.dec = ret.dec.concat(d.dec);
-        		} else {
-        			err = err.concat(error("Object at index "+index+" missing parameters.", node.elts[0]));
-        		}
-        	});
+            } else {
+              err = err.concat(error("Object at index "+index+" missing parameters.", node.elts[0]));
+            }
+          });
         }
       }
       resume([].concat(err), ret);
@@ -520,7 +520,7 @@ let translate = (function() {
     ret.progress = t;
     ret.dec = test0;
     return ret;
-  }
+  };
   function set(node, options, resume, params){
     visit(node.elts[0], options, function (err, val) {
       if(typeof val !== "object" || !val){
@@ -545,20 +545,20 @@ let translate = (function() {
             if(!(val2 instanceof Array)){
               err2 = err2.concat(error("Please provide an array or brewer color.", node.elts[1]));
             } else {
-            	var ret = [];
+              var ret = [];
               val2.forEach(function (element, index, array){
                 if(typeof element === "string" && /^#[0-9A-F]{6}$/i.test(element)){//valid hex string.
-                	var temp = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(element);
-                	ret = ret.concat({
-                		r: parseInt(temp[1], 16),
-                		g: parseInt(temp[2], 16),
-                		b: parseInt(temp[3], 16),
-                		a: 'ast'
-                	});
+                  var temp = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(element);
+                  ret = ret.concat({
+                    r: parseInt(temp[1], 16),
+                    g: parseInt(temp[2], 16),
+                    b: parseInt(temp[3], 16),
+                    a: 'ast'
+                  });
                 } else if(!isNaN(element.r) && !isNaN(element.g) && !isNaN(element.b)){
-                	ret = ret.concat(element);
+                  ret = ret.concat(element);
                 } else {
-                	err2 = err2.concat(error("Index " + index + " is not a valid hex string or rgb color.", node.elts[1]));
+                  err2 = err2.concat(error("Index " + index + " is not a valid hex string or rgb color.", node.elts[1]));
                 }
               });
             }
@@ -569,37 +569,37 @@ let translate = (function() {
       }
       resume([].concat(err), val);
     });
-  }
+  };
   function text(node, options, resume){//0 = graph, 1 = string
-  	let res = [];
-  	visit(node.elts[1], options, function (err1, val1) {//string
-			if(typeof val1 === "string"){//no point in an array given what we're actually doing with it.
-				res = [val1];
+    let res = [];
+    visit(node.elts[1], options, function (err1, val1) {//string
+      if(typeof val1 === "string"){//no point in an array given what we're actually doing with it.
+        res = [val1];
 
-			} else if(val1 instanceof Array){
-				val1.forEach(function (element, index){
-					if(typeof element === "string"){
-						res = res.concat(element);
-					} else {
-						err1 = err1.concat(error("Index "+index+" is not a string.", node.elts[1]));
-					}
-				});
-			} else {
-				err1 = err1.concat(error("Argument is not a string or array thereof.", node.elts[1]));
-			}
-			let params = {
-				op: "default",
-				prop: "text",
-				val: res
-			};
-			set(node, options, function (err, val) {
-				if(val.goal.length > res.length && res.length != 1){
-					err1 = err1.concat(error("Argument array is too small for the data.", node.elts[1]));
-				}
-				resume([].concat(err).concat(err1), val);
-			}, params);			
-  	});
-  }
+      } else if(val1 instanceof Array){
+        val1.forEach(function (element, index){
+          if(typeof element === "string"){
+            res = res.concat(element);
+          } else {
+            err1 = err1.concat(error("Index "+index+" is not a string.", node.elts[1]));
+          }
+        });
+      } else {
+        err1 = err1.concat(error("Argument is not a string or array thereof.", node.elts[1]));
+      }
+      let params = {
+        op: "default",
+        prop: "text",
+        val: res
+      };
+      set(node, options, function (err, val) {
+        if(val.goal.length > res.length && res.length !== 1){
+          err1 = err1.concat(error("Argument array is too small for the data.", node.elts[1]));
+        }
+        resume([].concat(err).concat(err1), val);
+      }, params);     
+    });
+  };
   function bar(node, options, resume){
     let params = {
       op: "default",
@@ -628,7 +628,7 @@ let translate = (function() {
       }//if thickness is already set we just roll with it, if innerradius alone is set we generate an ideal thickness
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function dividers(node, options, resume){
     let params = {
       op: "positive",
@@ -637,7 +637,7 @@ let translate = (function() {
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function fraction(node, options, resume){
     let params = {
       op: "default",
@@ -647,13 +647,13 @@ let translate = (function() {
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function secbar(node, options, resume){
-  	let params = {
-  		op: "default",
-  		prop: "secondary",
-  		val: true
-  	};
+    let params = {
+      op: "default",
+      prop: "secondary",
+      val: true
+    };
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
@@ -666,7 +666,7 @@ let translate = (function() {
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function size(node, options, resume) {
     let params = {
       op: "positive",
@@ -675,7 +675,7 @@ let translate = (function() {
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function thick(node, options, resume) {
     let params = {
       op: "positive",
@@ -684,7 +684,7 @@ let translate = (function() {
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function gap(node, options, resume) {
     let params = {
       op: "positive",
@@ -693,7 +693,7 @@ let translate = (function() {
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function inner(node, options, resume){
     visit(node.elts[1], options, function (err2, val2) {
       let params = {
@@ -708,7 +708,7 @@ let translate = (function() {
         resume([].concat(err1).concat(err2), val1);
       }, params)
     });
-  }
+  };
   function divwidth(node, options, resume){
     visit(node.elts[1], options, function (err2, val2) {
       let params = {
@@ -716,14 +716,14 @@ let translate = (function() {
         prop: "divwidth"
       };
       set(node, options, function (err1, val1) {
-      	//18 at 20 dividers, 12 at 30 dividers, 36 at 10 dividers and the pattern becomes obvious.
+        //18 at 20 dividers, 12 at 30 dividers, 36 at 10 dividers and the pattern becomes obvious.
         if(val1.div && val2 >= 360/val1.div){
           err2 = err2.concat(error("Dividers too large to fit.", node.elts[1]));
         }
         resume([].concat(err1).concat(err2), val1);
       }, params)
     });
-  }
+  };
   
   let labeloptions = {//second word is x, first is y
     "on": "top right",
@@ -749,10 +749,10 @@ let translate = (function() {
   };
   function labels(node, options, resume){//0 is object, 1 is parameter
     visit(node.elts[1], options, function (err2, val2) {
-    	if(val2.startsWith('key')){
-    		var key = true;
-    		val2 = val2.substr(val2.indexOf(" ") + 1);
-    	}
+      if(val2.startsWith('key')){
+        var key = true;
+        val2 = val2.substr(val2.indexOf(" ") + 1);
+      }
       if(!labeloptions[val2]){
         val2 = "off";
         err2 = err2.concat(error("Invalid label option. Please try a direction such as 'top left'.", node.elts[1]));
@@ -763,60 +763,60 @@ let translate = (function() {
         val: labeloptions[val2]
       };
       set(node, options, function (err1, val1) {
-      	if(val2 == "on" && val1.goal.length == 1){
-      		val1.labels = "center";
-      	}
-      	if(key){
-      		val1.key = true;
-      	}
+        if(val2 === "on" && val1.goal.length === 1){
+          val1.labels = "center";
+        }
+        if(key){
+          val1.key = true;
+        }
         resume([].concat(err1).concat(err2), val1);
       }, params)
     });
-  }
+  };
   function image(node, options, resume){//image position height width url object
-  	var ret = {
-    	url: '',
-    	position: '',
-    	height: 0,
-			width: 0
+    var ret = {
+      url: '',
+      position: '',
+      height: 0,
+      width: 0
     };
     visit(node.elts[1], options, function (err1, val1) {//url
-    	if(typeof val1 === 'string'){
-				ret.url = val1;
-    	} else {
-    		err1 = err1.concat(error("Invalid URL.", node.elts[1]));
-    	}
-    	visit(node.elts[2], options, function (err2, val2) {//width
-				if(!isNaN(val2) && val2 > 0){
-					ret.width = val2;
-				} else {
-					err2 = err2.concat(error("Argument must be a positive number.", node.elts[2]));
-				}
-	    	visit(node.elts[3], options, function (err3, val3) {//height
-					if(!isNaN(val3) && val3 > 0){
-						ret.height = val3;
-					} else {
-						err3 = err3.concat(error("Argument must be a positive number.", node.elts[3]));
-					}
-					visit(node.elts[4], options, function(err4, val4) {//position
-						if(!labeloptions[val4]){
-	        		err4 = err4.concat(error("Invalid position option. Please try a direction such as 'top left'.", node.elts[4]));
-	      		} else {
-							ret.position = labeloptions[val4];
-	      		}
-	      		let params = {
-	      			op: "default",
-	      			prop: "image",
-	      			val: ret
-	      		};
-	      		set(node, options, function (err, val) {
-							resume([].concat(err).concat(err1).concat(err2).concat(err3).concat(err4), val);
-	      		}, params);
-					});
-				});
-    	});
+      if(typeof val1 === 'string'){
+        ret.url = val1;
+      } else {
+        err1 = err1.concat(error("Invalid URL.", node.elts[1]));
+      }
+      visit(node.elts[2], options, function (err2, val2) {//width
+        if(!isNaN(val2) && val2 > 0){
+          ret.width = val2;
+        } else {
+          err2 = err2.concat(error("Argument must be a positive number.", node.elts[2]));
+        }
+        visit(node.elts[3], options, function (err3, val3) {//height
+          if(!isNaN(val3) && val3 > 0){
+            ret.height = val3;
+          } else {
+            err3 = err3.concat(error("Argument must be a positive number.", node.elts[3]));
+          }
+          visit(node.elts[4], options, function(err4, val4) {//position
+            if(!labeloptions[val4]){
+              err4 = err4.concat(error("Invalid position option. Please try a direction such as 'top left'.", node.elts[4]));
+            } else {
+              ret.position = labeloptions[val4];
+            }
+            let params = {
+              op: "default",
+              prop: "image",
+              val: ret
+            };
+            set(node, options, function (err, val) {
+              resume([].concat(err).concat(err1).concat(err2).concat(err3).concat(err4), val);
+            }, params);
+          });
+        });
+      });
     });
-  }
+  };
   function rounding(node, options, resume) {
     let params = {
       op: "positive",
@@ -825,13 +825,13 @@ let translate = (function() {
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function rotate(node, options, resume) {
     visit(node.elts[1], options, function (err2, val2) {
       if(isNaN(val2)){
         err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
       } else {
-      	val2 = +val2;
+        val2 = +val2;
         while(val2 >= 360){
           val2 -= 360;
         }//720 becomes 0, 390 becomes 30
@@ -848,7 +848,7 @@ let translate = (function() {
         resume([].concat(err1).concat(err2), val1);
       }, params)
     });
-  }
+  };
   function arc(node, options, resume){
     visit(node.elts[1], options, function (err2, val2) {
       if (isNaN(val2)) {
@@ -870,30 +870,30 @@ let translate = (function() {
     });
   };
   function rgba(node, options, resume){
-  	visit(node.elts[0], options, function (err1, val1) {//a
-  		if(isNaN(val1) || val1 < 0){
-  			err1 = err1.concat(error("Alpha must be a positive number.", node.elts[0]));
-  		} else {
+    visit(node.elts[0], options, function (err1, val1) {//a
+      if(isNaN(val1) || val1 < 0){
+        err1 = err1.concat(error("Alpha must be a positive number.", node.elts[0]));
+      } else {
         if(val1 > 1 && val1 < 100){
           val1 = val1/100;
         } else if (val1 >= 100){
           val1 = 1;
         }
-  		}
-  		let test = node.elts.shift();
-  		rgb(node, options, function(err2, val2) {//run rgb, add alpha
-  			val2.a = +val1;
-  			node.elts.unshift(test);
-  			resume([].concat(err1).concat(err2), val2);
-  		});
-  	});
-  }
+      }
+      let test = node.elts.shift();
+      rgb(node, options, function(err2, val2) {//run rgb, add alpha
+        val2.a = +val1;
+        node.elts.unshift(test);
+        resume([].concat(err1).concat(err2), val2);
+      });
+    });
+  };
   function rgb(node, options, resume){
     let ret = {
-    	r: 0,
-    	g: 0,
-    	b: 0,
-    	a: 'ast'
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 'ast'
     };
     visit(node.elts[0], options, function (err1, val1) {//b
       if(isNaN(val1) || val1 < 0 || +val1 > 255){
@@ -914,7 +914,7 @@ let translate = (function() {
         });
       });
     });
-  }
+  };
   function opacity(node, options, resume) {
     visit(node.elts[1], options, function (err2, val2) {
       if(isNaN(val2) || val2 < 0){
@@ -956,7 +956,7 @@ let translate = (function() {
         resume([].concat(err1).concat(err2), val1);
       }, params)
     });
-  }
+  };
   let colors = {
     "yellow green" : 'YlGn',
     "yellow green blue" : 'YlGnBu',
@@ -988,7 +988,7 @@ let translate = (function() {
     "dark" : 'Dark2',
     "pastel" : 'Pastel1',
     "accent" : 'Accent',
-  }
+  };
   function brewer(node, options, resume) {//takes in color string and length, outputs array
     let ret = 0;
     visit(node.elts[0], options, function (err, val) {
@@ -999,7 +999,7 @@ let translate = (function() {
         if(!colors[val]){
           err = err.concat(error("Unrecognized color, please use lower case.", node.elts[0]));
         } else {
-          if(isNaN(val2) || typeof colorbrewer[colors[val]][+val2] == 'undefined'){
+          if(isNaN(val2) || typeof colorbrewer[colors[val]][+val2] === 'undefined'){
             err2 = err2.concat(error("Invalid size parameter.", node.elts[1]));
           } else {
             ret = colorbrewer[colors[val]][+val2];
@@ -1008,7 +1008,7 @@ let translate = (function() {
         resume([].concat(err).concat(err2), ret);//finds the right name and then grabs the colorbrewer array
       });
     });
-  }
+  };
   function fill(node, options, resume) {//first parameter is, of course, goal, second is color
     let params = {
       op: "color",
@@ -1017,7 +1017,7 @@ let translate = (function() {
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function barback(node, options, resume) {
     let params = {
       op: "color",
@@ -1026,7 +1026,7 @@ let translate = (function() {
     set(node, options, function (err, val) {
       resume([].concat(err), val);
     }, params);
-  }
+  };
   function style(node, options, resume) {
     visit(node.elts[1], options, function (err2, val2) {
       let params = {
@@ -1053,7 +1053,7 @@ let translate = (function() {
       }
       resume([].concat(err), ret);
     });
-  }
+  };
   function binding(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
@@ -1079,7 +1079,7 @@ let translate = (function() {
       options = {};
     }
     visit(node.elts[0], options, resume);
-  }
+  };
   let table = {
     "PROG" : program,
     "EXPRS" : exprs,
@@ -1123,7 +1123,7 @@ let translate = (function() {
     "ARC" : arc,
     "TEXT" : text,
     "IMAGE" : image,
-  }
+  };
   return translate;
 })();
 let render = (function() {
@@ -1135,11 +1135,11 @@ let render = (function() {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
-  }
+  };
   function render(val, resume) {
     // Do some rendering here.
     resume([], val);
-  }
+  };
   return render;
 })();
 export let compiler = (function () {

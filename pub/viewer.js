@@ -83,21 +83,21 @@ window.exports.viewer = (function () {
             var iprog = d3.interpolate(0, group.progress[i]);
             var ival = d3.interpolate(0, group.current[i]);
             var igoal = d3.interpolate(0, group.goal[i]);
-              return function (t){
-                if(group.text.length == 1){
-                  this.textContent = group.text[0]
-                    .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                    .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
-                    .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
-                } else {
-                  this.textContent = group.text[i]
-                    .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                    .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
-                    .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
-                }
+            return function (t){
+              if(group.text.length == 1){
+                this.textContent = group.text[0]
+                  .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
+                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
+              } else {
+                this.textContent = group.text[i]
+                  .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
+                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
               }
+            }
           });
       }
       gr.append("rect")//one back rectangle per datum
@@ -113,7 +113,6 @@ window.exports.viewer = (function () {
           return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a+")";
         });
       //no transition for the back ones.
-      var clamp = [];
       if(group.div){
         var progress = group.progress;
         var prog = [];
@@ -121,34 +120,28 @@ window.exports.viewer = (function () {
         var it = [];
         divwidth = group.graphsize/group.div - group.divwidth;
         gr.append("rect")
-            .attr("x", function (d, i){point[i] = group.divwidth/2; return point[i];})
-            .attr("y", function (d, i){ return (group.thickness+group.gap)*i;})//this is much easier now that I know I can get the index
-            .attr("rx", group.rounding)
-            .attr("ry", group.rounding)
-            .attr("width", divwidth)
-            .attr("height", group.thickness)
-            .attr("fill", function (d, i){
-              var tt = color(i);
-              return "rgba("+tt.r+","+tt.g+","+tt.b+","+0+")";
-            })
-            .transition(function (d, i){return "bar"+i;})
-            .delay(function (d, i){it[i] = 0; return it[i]*group.transition*1000/(group.div*progress[i]/100);})
-            .duration(function (d, i){return group.transition*1000/(group.div*progress[i]/100);})
-            .attr("fill", function (d, i){
-              prog[i] = progress[i]/100;
-              if(prog[i]>1){
-                prog[i]=1;
-              }
-              var ch = (prog[i])*group.div;
-              if(ch>1){//if it doesn't fit in this divider
-                ch=1;
-              }
-              prog[i] -= (1/group.div);//decrease the running progress by the divider's size
-              var tt = color(i);
-              if(isNaN(tt.a)){tt.a = group.graphopacity;}
-              return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a*ch+")";
-            })
-            .each(function (e, i){return divr(e, i);});
+          .attr("x", function (d, i){ return point[i] = group.divwidth/2;})
+          .attr("y", function (d, i){ return (group.thickness+group.gap)*i;})//this is much easier now that I know I can get the index
+          .attr("rx", group.rounding)
+          .attr("ry", group.rounding)
+          .attr("width", divwidth)
+          .attr("height", group.thickness)
+          .attr("fill", function (d, i){
+            var tt = color(i);
+            return "rgba("+tt.r+","+tt.g+","+tt.b+","+0+")";
+          })
+          .transition(function (d, i){return "bar"+i;})
+          .delay(function (d, i){it[i] = 0; return it[i]*group.transition*1000/(group.div*progress[i]/100);})
+          .duration(function (d, i){return group.transition*1000/(group.div*progress[i]/100);})
+          .attr("fill", function (d, i){
+            prog[i] = Math.min(progress[i]/100, 1);
+            var ch = Math.min((prog[i])*group.div, 1);
+            prog[i] -= (1/group.div);//decrease the running progress by the divider's size
+            var tt = color(i);
+            if(isNaN(tt.a)){tt.a = group.graphopacity;}
+            return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a*ch+")";
+          })
+          .each(function (e, i){return divr(e, i);});
         function divr(e, i){
           if(prog[i] > 0){
             point[i] += divwidth + group.divwidth;
@@ -168,10 +161,7 @@ window.exports.viewer = (function () {
               .delay(function (d){return it[i]*group.transition*1000/(group.div*progress[i]/100);})
               .duration(function (d){return group.transition*1000/(group.div*progress[i]/100);})
               .attr("fill", function (d){
-                var ch = (prog[i])*group.div;
-                if(ch>1){//if it doesn't fit in this divider
-                  ch=1;
-                }
+                var ch = Math.min((prog[i])*group.div, 1);
                 prog[i] -= (1/group.div);//decrease the running progress by the divider's size
                 var tt = color(i);
                 if(isNaN(tt.a)){tt.a = group.graphopacity;}
@@ -181,23 +171,24 @@ window.exports.viewer = (function () {
           }
         };
       } else {
+        var clamp = [];
         gr.append("rect")//one per datum, again.
-            .attr("x", 0)
-            .attr("y", function (d, i){ return (group.thickness+group.gap)*i;})//this is much easier now that I know I can get the index
-            .attr("rx", group.rounding)
-            .attr("ry", group.rounding)
-            .attr("width", function (d, i){
-              clamp = clamp.concat((group.current[i]/group.goal[i] > 1) ? 1 : group.current[i]/group.goal[i]);
-              return (group.rounding*2 < group.graphsize*clamp[i] ? group.rounding*2 : group.graphsize*clamp[i]);})
-            .attr("height", group.thickness)
-            .attr("fill", function (d, i){
-              var tt = color(i);
-              if(isNaN(tt.a)){tt.a = group.graphopacity;}
-              return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a+")";
-            })
-            .transition(function (d, i){return "bar"+i;})//if the function doesn't work figure out another naming convention
-            .duration(group.transition*1000)
-            .attr("width", function (d, i) {return group.graphsize*clamp[i];});
+          .attr("x", 0)
+          .attr("y", function (d, i){ return (group.thickness+group.gap)*i;})//this is much easier now that I know I can get the index
+          .attr("rx", group.rounding)
+          .attr("ry", group.rounding)
+          .attr("width", function (d, i){
+            clamp = clamp.concat(Math.min(group.current[i]/group.goal[i], 1));
+            return (group.rounding*2 < group.graphsize*clamp[i] ? group.rounding*2 : group.graphsize*clamp[i]);})
+          .attr("height", group.thickness)
+          .attr("fill", function (d, i){
+            var tt = color(i);
+            if(isNaN(tt.a)){tt.a = group.graphopacity;}
+            return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a+")";
+          })
+          .transition(function (d, i){return "bar"+i;})//if the function doesn't work figure out another naming convention
+          .duration(group.transition*1000)
+          .attr("width", function (d, i) {return group.graphsize*clamp[i];});
       }
       y = (group.thickness+group.gap)*group.goal.length - group.gap;
       x = group.graphsize+textwidth;
@@ -287,7 +278,7 @@ window.exports.viewer = (function () {
         gr.append("path")
           .attr("d", function (d, i){
             curarc = d3.svg.arc()//just use this to set the desired points
-              .startAngle(function (d, i){point[i] = rot + group.divwidth*(Math.PI/360); return point[i];})
+              .startAngle(function (d, i){return point[i] = rot + group.divwidth*(Math.PI/360);})
               .endAngle(function (d, i){return point[i] + divrad;})
               .innerRadius(function (d, i){return ir[i];})
               .outerRadius(function (d, i){return or[i];});
@@ -301,14 +292,8 @@ window.exports.viewer = (function () {
           .delay(function (d, i){it[i] = 0; return delay + it[i]*group.transition*1000/(group.div*progress[i]/100);})
           .duration(function (d, i){return group.transition*1000/(group.div*progress[i]/100);})
           .attr("fill", function (d, i){
-            prog[i] = progress[i]/100;
-            if(prog[i]>1){
-              prog[i]=1;
-            }
-            var ch = (prog[i])*group.div;
-            if(ch>1){//larger than the divider
-              ch=1;
-            }
+            prog[i] = Math.min(progress[i]/100, 1);
+            var ch = Math.min((prog[i])*group.div, 1);
             prog[i] -= (1/group.div);//decrease by divider fraction
             var tt = color(i);
             if(isNaN(tt.a)){tt.a = group.graphopacity;}
@@ -337,10 +322,7 @@ window.exports.viewer = (function () {
               .delay(function (d){return delay + it[i]*group.transition*1000/(group.div*progress[i]/100);})
               .duration(function (d){return group.transition*1000/(group.div*progress[i]/100);})
               .attr("fill", function (d){
-                var ch = (prog[i])*group.div;
-                if(ch>1){//larger than the divider
-                  ch=1;
-                }
+                var ch = Math.min((prog[i])*group.div, 1);
                 prog[i] -= (1/group.div);//decrease by divider fraction
                 var tt = color(i);
                 if(isNaN(tt.a)){tt.a = group.graphopacity;}
@@ -352,8 +334,7 @@ window.exports.viewer = (function () {
         var progtest = false;
         var np = [];
         for(var t = 0; t < progress.length; t++){
-          np[t] = progress[t] - 100;
-          if(np[t]<0){np[t]=0;}
+          np[t] = Math.max(progress[t] - 100, 0);
           if(!progtest && np[t] > 0){
             progtest = true;
           }
@@ -433,7 +414,7 @@ window.exports.viewer = (function () {
             progtest = true;
           }
         }
-        if(progtest){//figure out how to delay until when it actually hits 100.
+        if(progtest){
           if(redflag){
             raddi(size-thickness, np, gap, thickness, rot, delay+group.transition*800, false);
           } else {
@@ -542,22 +523,22 @@ window.exports.viewer = (function () {
             var iprog = d3.interpolate(0, group.progress[i]);
             var ival = d3.interpolate(0, group.current[i]);
             var igoal = d3.interpolate(0, group.goal[i]);
-              return function (t){
-                if(group.text.length == 1){
-                  this.textContent = group.text[0]
-                    .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                    .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
-                    .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
-                } else {
-                  this.textContent = group.text[i]
-                    .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                    .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
-                    .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
-                }
+            return function (t){
+              if(group.text.length == 1){
+                this.textContent = group.text[0]
+                  .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
+                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
+              } else {
+                this.textContent = group.text[i]
+                  .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
+                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
               }
-          });//radius is fontsize/2
+            }
+          });
         /*if(group.key){
           gr.append("circle")
             .attr('r', (fontsize)/3)
