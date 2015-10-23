@@ -450,8 +450,8 @@ let translate = (function() {
       if(!(val instanceof Array) || !val.length ){
         err = err.concat(error("Invalid parameters.", node.elts[0]));
       } else if(val instanceof Array && val.length) {//it's an array in any case.
-        if(typeof val[0] === "object" && val[0].key && val[1].key){//one object (0 = goal, 1 = value)
-          if(val[0].key === "goal" && val[1].key === "value"){
+        if(typeof val[0] === "object" && val[0] && val[0].key){//one object (0 = goal, 1 = value)
+          if(val[0].key === "goal" && val[1] && val[1].key && val[1].key === "value"){
             var d = decprog(val[0].val, val[1].val);
             ret.goal = ret.goal.concat(+d.goal);
             ret.current = ret.current.concat(+d.value);
@@ -462,8 +462,8 @@ let translate = (function() {
           }
         } else if(val[0] instanceof Array && val[0].length){//array contains arrays itself
           val.forEach(function (element, index, array) {//each one should be a goal object and value object
-            if(typeof element[0] === "object" && element[0].key && element[1].key){//one object (0 = goal, 1 = value)
-              if(element[0].key === "goal" && element[1].key === "value"){
+            if(typeof element[0] === "object" && element[0] && element[0].key){//one object (0 = goal, 1 = value)
+              if(element[0].key === "goal" && element[1] && element[1].key && element[1].key === "value"){
                 var d = decprog(element[0].val, element[1].val);
                 ret.goal = ret.goal.concat(+d.goal);
                 ret.current = ret.current.concat(+d.value);
@@ -704,6 +704,9 @@ let translate = (function() {
         if(val2 > val1.graphsize){
           err2 = err2.concat(error("Inner radius must be less than outer.", node.elts[1]));
         }
+        if(val1.progress.length === 1){
+          err2 = err2.concat(error("Inner radius does not operate with a single graph.", node.elts[1]));
+        }
         val1.thickness = 0;
         resume([].concat(err1).concat(err2), val1);
       }, params)
@@ -855,7 +858,7 @@ let translate = (function() {
         err2 = err2.concat(error("Argument must be a positive number.", node.elts[1]));
       } else {
         val2 = +val2;
-        if(val2 > 360 || val2 < 0){
+        if(val2 > 360 || val2 <= 0){
           err2 = err2.concat(error("Argument must be between 0 and 360.", node.elts[1]));
         }
       }
