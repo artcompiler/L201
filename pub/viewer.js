@@ -281,7 +281,8 @@ window.exports.viewer = (function () {
               .startAngle(function (d, i){return point[i] = rot + group.divwidth*(Math.PI/360);})
               .endAngle(function (d, i){return point[i] + divrad;})
               .innerRadius(function (d, i){return ir[i];})
-              .outerRadius(function (d, i){return or[i];});
+              .outerRadius(function (d, i){return or[i];})
+              .cornerRadius(group.rounding);
             return curarc(d, i);
           })
           .attr("fill", function (d, i){
@@ -311,7 +312,8 @@ window.exports.viewer = (function () {
                   .startAngle(function (d){return point[i];})
                   .endAngle(function (d){return point[i] + divrad;})
                   .innerRadius(function (d){return ir[i];})
-                  .outerRadius(function (d){return or[i];});//size can also vary for the second loop.
+                  .outerRadius(function (d){return or[i];})
+                  .cornerRadius(group.rounding);//size can also vary for the second loop.
                 return curarc(d, ind);
               })
               .attr("fill", function (d){
@@ -383,7 +385,8 @@ window.exports.viewer = (function () {
               .startAngle(rot)
               .endAngle(rot)
               .innerRadius(function (d, i){return ir[i];})
-              .outerRadius(function (d, i){return or[i];});
+              .outerRadius(function (d, i){return or[i];})
+              .cornerRadius(group.rounding);
             return arcs[i](d, i);
           })
           .attr("fill", function (d, i){
