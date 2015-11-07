@@ -17,7 +17,7 @@ window.exports.viewer = (function () {
           group = element;
         } else if(element.bg){
           if(typeof element.bg === "object" && element.bg && element.bg.r){
-            bgcol = 'rgb(+'+ (+element.bg.r) +','+ (+element.bg.g) +','+ (+element.bg.b) +')';
+            bgcol = 'rgb('+ (+element.bg.r) +','+ (+element.bg.g) +','+ (+element.bg.b) +')';
           } else {
             bgcol = element.bg;
           }
@@ -58,24 +58,18 @@ window.exports.viewer = (function () {
           .attr("x", group.graphsize)
           .attr("y", function (d, i){return group.thickness + (group.thickness+group.gap)*i;})
           .text(function (d, i){
-            if(group.texttype=='percent'){
-              return (group.progress[i].toFixed(group.dec[i])+'%');
-            } else if (group.texttype=='fraction'){
-              return (group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]));
-            } else {//run through the array
-              if (group.text.length == 1){
-                return group.text[0]
-                    .replace(/%percent/g, group.progress[i].toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]))
-                    .replace(/%goal/g, group.goal[i].toFixed(group.dec[i]))
-                    .replace(/%value/g, group.current[i].toFixed(group.dec[i]));
-              } else {
-                return group.text[i]
-                    .replace(/%percent/g, group.progress[i].toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]))
-                    .replace(/%goal/g, group.goal[i].toFixed(group.dec[i]))
-                    .replace(/%value/g, group.current[i].toFixed(group.dec[i]));
-              }
+            if (group.text.length == 1){
+              return group.text[0]
+                  .replace(/%percent/g, group.progress[i].toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]))
+                  .replace(/%goal/g, group.goal[i].toFixed(group.dec[i]))
+                  .replace(/%value/g, group.current[i].toFixed(group.dec[i]));
+            } else {
+              return group.text[i]
+                  .replace(/%percent/g, group.progress[i].toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]))
+                  .replace(/%goal/g, group.goal[i].toFixed(group.dec[i]))
+                  .replace(/%value/g, group.current[i].toFixed(group.dec[i]));
             }
           })
           .style("font-size", fontsize+"px")
@@ -89,29 +83,19 @@ window.exports.viewer = (function () {
             var iprog = d3.interpolate(0, group.progress[i]);
             var ival = d3.interpolate(0, group.current[i]);
             var igoal = d3.interpolate(0, group.goal[i]);
-            if(group.texttype == 'percent'){
-              return function (t){
-                this.textContent = (+(iprog(t).toFixed(group.dec[i]))) + "%";
-              }
-            } else if(group.texttype == 'fraction'){
-              return function (t){
-                this.textContent = (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i])));
-              }
-            } else {//custom text
-              return function (t){
-                if(group.text.length == 1){
-                  this.textContent = group.text[0]
-                    .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                    .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
-                    .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
-                } else {
-                  this.textContent = group.text[i]
-                    .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                    .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
-                    .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
-                }
+            return function (t){
+              if(group.text.length == 1){
+                this.textContent = group.text[0]
+                  .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
+                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
+              } else {
+                this.textContent = group.text[i]
+                  .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
+                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
               }
             }
           });
@@ -129,7 +113,6 @@ window.exports.viewer = (function () {
           return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a+")";
         });
       //no transition for the back ones.
-      var clamp = [];
       if(group.div){
         var progress = group.progress;
         var prog = [];
@@ -137,34 +120,28 @@ window.exports.viewer = (function () {
         var it = [];
         divwidth = group.graphsize/group.div - group.divwidth;
         gr.append("rect")
-            .attr("x", function (d, i){point[i] = group.divwidth/2; return point[i];})
-            .attr("y", function (d, i){ return (group.thickness+group.gap)*i;})//this is much easier now that I know I can get the index
-            .attr("rx", group.rounding)
-            .attr("ry", group.rounding)
-            .attr("width", divwidth)
-            .attr("height", group.thickness)
-            .attr("fill", function (d, i){
-              var tt = color(i);
-              return "rgba("+tt.r+","+tt.g+","+tt.b+","+0+")";
-            })
-            .transition(function (d, i){return "bar"+i;})
-            .delay(function (d, i){it[i] = 0; return it[i]*group.transition*1000/(group.div*progress[i]/100);})
-            .duration(function (d, i){return group.transition*1000/(group.div*progress[i]/100);})
-            .attr("fill", function (d, i){
-              prog[i] = progress[i]/100;
-              if(prog[i]>1){
-                prog[i]=1;
-              }
-              var ch = (prog[i])*group.div;
-              if(ch>1){//if it doesn't fit in this divider
-                ch=1;
-              }
-              prog[i] -= (1/group.div);//decrease the running progress by the divider's size
-              var tt = color(i);
-              if(isNaN(tt.a)){tt.a = group.graphopacity;}
-              return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a*ch+")";
-            })
-            .each(function (e, i){return divr(e, i);});
+          .attr("x", function (d, i){ return point[i] = group.divwidth/2;})
+          .attr("y", function (d, i){ return (group.thickness+group.gap)*i;})//this is much easier now that I know I can get the index
+          .attr("rx", group.rounding)
+          .attr("ry", group.rounding)
+          .attr("width", divwidth)
+          .attr("height", group.thickness)
+          .attr("fill", function (d, i){
+            var tt = color(i);
+            return "rgba("+tt.r+","+tt.g+","+tt.b+","+0+")";
+          })
+          .transition(function (d, i){return "bar"+i;})
+          .delay(function (d, i){it[i] = 0; return it[i]*group.transition*1000/(group.div*progress[i]/100);})
+          .duration(function (d, i){return group.transition*1000/(group.div*progress[i]/100);})
+          .attr("fill", function (d, i){
+            prog[i] = Math.min(progress[i]/100, 1);
+            var ch = Math.min((prog[i])*group.div, 1);
+            prog[i] -= (1/group.div);//decrease the running progress by the divider's size
+            var tt = color(i);
+            if(isNaN(tt.a)){tt.a = group.graphopacity;}
+            return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a*ch+")";
+          })
+          .each(function (e, i){return divr(e, i);});
         function divr(e, i){
           if(prog[i] > 0){
             point[i] += divwidth + group.divwidth;
@@ -184,10 +161,7 @@ window.exports.viewer = (function () {
               .delay(function (d){return it[i]*group.transition*1000/(group.div*progress[i]/100);})
               .duration(function (d){return group.transition*1000/(group.div*progress[i]/100);})
               .attr("fill", function (d){
-                var ch = (prog[i])*group.div;
-                if(ch>1){//if it doesn't fit in this divider
-                  ch=1;
-                }
+                var ch = Math.min((prog[i])*group.div, 1);
                 prog[i] -= (1/group.div);//decrease the running progress by the divider's size
                 var tt = color(i);
                 if(isNaN(tt.a)){tt.a = group.graphopacity;}
@@ -197,23 +171,24 @@ window.exports.viewer = (function () {
           }
         };
       } else {
+        var clamp = [];
         gr.append("rect")//one per datum, again.
-            .attr("x", 0)
-            .attr("y", function (d, i){ return (group.thickness+group.gap)*i;})//this is much easier now that I know I can get the index
-            .attr("rx", group.rounding)
-            .attr("ry", group.rounding)
-            .attr("width", function (d, i){
-              clamp = clamp.concat((group.current[i]/group.goal[i] > 1) ? 1 : group.current[i]/group.goal[i]);
-              return (group.rounding*2 < group.graphsize*clamp[i] ? group.rounding*2 : group.graphsize*clamp[i]);})
-            .attr("height", group.thickness)
-            .attr("fill", function (d, i){
-              var tt = color(i);
-              if(isNaN(tt.a)){tt.a = group.graphopacity;}
-              return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a+")";
-            })
-            .transition(function (d, i){return "bar"+i;})//if the function doesn't work figure out another naming convention
-            .duration(group.transition*1000)
-            .attr("width", function (d, i) {return group.graphsize*clamp[i];});
+          .attr("x", 0)
+          .attr("y", function (d, i){ return (group.thickness+group.gap)*i;})//this is much easier now that I know I can get the index
+          .attr("rx", group.rounding)
+          .attr("ry", group.rounding)
+          .attr("width", function (d, i){
+            clamp = clamp.concat(Math.min(group.current[i]/group.goal[i], 1));
+            return (group.rounding*2 < group.graphsize*clamp[i] ? group.rounding*2 : group.graphsize*clamp[i]);})
+          .attr("height", group.thickness)
+          .attr("fill", function (d, i){
+            var tt = color(i);
+            if(isNaN(tt.a)){tt.a = group.graphopacity;}
+            return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a+")";
+          })
+          .transition(function (d, i){return "bar"+i;})//if the function doesn't work figure out another naming convention
+          .duration(group.transition*1000)
+          .attr("width", function (d, i) {return group.graphsize*clamp[i];});
       }
       y = (group.thickness+group.gap)*group.goal.length - group.gap;
       x = group.graphsize+textwidth;
@@ -303,10 +278,11 @@ window.exports.viewer = (function () {
         gr.append("path")
           .attr("d", function (d, i){
             curarc = d3.svg.arc()//just use this to set the desired points
-              .startAngle(function (d, i){point[i] = rot + group.divwidth*(Math.PI/360); return point[i];})
+              .startAngle(function (d, i){return point[i] = rot + group.divwidth*(Math.PI/360);})
               .endAngle(function (d, i){return point[i] + divrad;})
               .innerRadius(function (d, i){return ir[i];})
-              .outerRadius(function (d, i){return or[i];});
+              .outerRadius(function (d, i){return or[i];})
+              .cornerRadius(group.rounding);
             return curarc(d, i);
           })
           .attr("fill", function (d, i){
@@ -317,14 +293,8 @@ window.exports.viewer = (function () {
           .delay(function (d, i){it[i] = 0; return delay + it[i]*group.transition*1000/(group.div*progress[i]/100);})
           .duration(function (d, i){return group.transition*1000/(group.div*progress[i]/100);})
           .attr("fill", function (d, i){
-            prog[i] = progress[i]/100;
-            if(prog[i]>1){
-              prog[i]=1;
-            }
-            var ch = (prog[i])*group.div;
-            if(ch>1){//larger than the divider
-              ch=1;
-            }
+            prog[i] = Math.min(progress[i]/100, 1);
+            var ch = Math.min((prog[i])*group.div, 1);
             prog[i] -= (1/group.div);//decrease by divider fraction
             var tt = color(i);
             if(isNaN(tt.a)){tt.a = group.graphopacity;}
@@ -342,7 +312,8 @@ window.exports.viewer = (function () {
                   .startAngle(function (d){return point[i];})
                   .endAngle(function (d){return point[i] + divrad;})
                   .innerRadius(function (d){return ir[i];})
-                  .outerRadius(function (d){return or[i];});//size can also vary for the second loop.
+                  .outerRadius(function (d){return or[i];})
+                  .cornerRadius(group.rounding);//size can also vary for the second loop.
                 return curarc(d, ind);
               })
               .attr("fill", function (d){
@@ -353,10 +324,7 @@ window.exports.viewer = (function () {
               .delay(function (d){return delay + it[i]*group.transition*1000/(group.div*progress[i]/100);})
               .duration(function (d){return group.transition*1000/(group.div*progress[i]/100);})
               .attr("fill", function (d){
-                var ch = (prog[i])*group.div;
-                if(ch>1){//larger than the divider
-                  ch=1;
-                }
+                var ch = Math.min((prog[i])*group.div, 1);
                 prog[i] -= (1/group.div);//decrease by divider fraction
                 var tt = color(i);
                 if(isNaN(tt.a)){tt.a = group.graphopacity;}
@@ -368,8 +336,7 @@ window.exports.viewer = (function () {
         var progtest = false;
         var np = [];
         for(var t = 0; t < progress.length; t++){
-          np[t] = progress[t] - 100;
-          if(np[t]<0){np[t]=0;}
+          np[t] = Math.max(progress[t] - 100, 0);
           if(!progtest && np[t] > 0){
             progtest = true;
           }
@@ -418,7 +385,8 @@ window.exports.viewer = (function () {
               .startAngle(rot)
               .endAngle(rot)
               .innerRadius(function (d, i){return ir[i];})
-              .outerRadius(function (d, i){return or[i];});
+              .outerRadius(function (d, i){return or[i];})
+              .cornerRadius(group.rounding);
             return arcs[i](d, i);
           })
           .attr("fill", function (d, i){
@@ -449,7 +417,7 @@ window.exports.viewer = (function () {
             progtest = true;
           }
         }
-        if(progtest){//figure out how to delay until when it actually hits 100.
+        if(progtest){
           if(redflag){
             raddi(size-thickness, np, gap, thickness, rot, delay+group.transition*800, false);
           } else {
@@ -502,7 +470,7 @@ window.exports.viewer = (function () {
           });
       }
       if(group.labels != 'off'){
-        var textwidth = 0;
+        var textwidth = [];
         fontsize = (group.graphsize/(5));
         var tx = 0;
         var ty = 0;
@@ -532,31 +500,25 @@ window.exports.viewer = (function () {
           .attr("x", tx)
           .attr("y", function (d, i){return (group.labels.startsWith("bottom")) ? ty - (fontsize-1)*i : ty + (fontsize-1)*i;})
           .text(function (d, i){
-            if(group.texttype=='percent'){
-              return (group.progress[i].toFixed(group.dec[i])+'%');
-            } else if (group.texttype=='fraction'){
-              return (group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]));
+            if (group.text.length == 1){
+              return group.text[0]
+                  .replace(/%percent/g, group.progress[i].toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]))
+                  .replace(/%goal/g, group.goal[i].toFixed(group.dec[i]))
+                  .replace(/%value/g, group.current[i].toFixed(group.dec[i]));
             } else {
-              if (group.text.length == 1){
-                return group.text[0]
-                    .replace(/%percent/g, group.progress[i].toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]))
-                    .replace(/%goal/g, group.goal[i].toFixed(group.dec[i]))
-                    .replace(/%value/g, group.current[i].toFixed(group.dec[i]));
-              } else {
-                return group.text[i]
-                    .replace(/%percent/g, group.progress[i].toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]))
-                    .replace(/%goal/g, group.goal[i].toFixed(group.dec[i]))
-                    .replace(/%value/g, group.current[i].toFixed(group.dec[i]));
-              }
+              return group.text[i]
+                  .replace(/%percent/g, group.progress[i].toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, group.current[i].toFixed(group.dec[i])+'/'+group.goal[i].toFixed(group.dec[i]))
+                  .replace(/%goal/g, group.goal[i].toFixed(group.dec[i]))
+                  .replace(/%value/g, group.current[i].toFixed(group.dec[i]));
             }
           })
           .attr("text-anchor", (!tx) ? "middle" : (group.labels.endsWith('left')) ? "end" : "start")
           .style("font-size", fontsize+"px")
           .call(styles, group.style)
-          .each(function (d){
-            if(this.getBBox().width > textwidth){textwidth = this.getBBox().width;}
+          .each(function (d, i){
+            textwidth[i] = this.getBBox().width;
           })//need this to put the key in the right place.
           .transition(function (d, i){return "radt"+i;})
           .duration(group.transition*1000)
@@ -564,42 +526,32 @@ window.exports.viewer = (function () {
             var iprog = d3.interpolate(0, group.progress[i]);
             var ival = d3.interpolate(0, group.current[i]);
             var igoal = d3.interpolate(0, group.goal[i]);
-            if(group.texttype == 'percent'){
-              return function (t){
-                this.textContent = (+(iprog(t).toFixed(group.dec[i]))) + "%";
-              }
-            } else if(group.texttype == 'fraction'){
-              return function (t){
-                this.textContent = (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i])));
-              }
-            } else {//custom text
-              return function (t){
-                if(group.text.length == 1){
-                  this.textContent = group.text[0]
-                    .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                    .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
-                    .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
-                } else {
-                  this.textContent = group.text[i]
-                    .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                    .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                    .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
-                    .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
-                }
+            return function (t){
+              if(group.text.length == 1){
+                this.textContent = group.text[0]
+                  .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
+                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
+              } else {
+                this.textContent = group.text[i]
+                  .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
+                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
               }
             }
-          });//radius is fontsize/2
-        if(group.key){
+          });
+        /*if(group.key){
           gr.append("circle")
             .attr('r', (fontsize)/3)
             .attr('cx', function (d, i){
               if (group.labels.endsWith("left")){//anchored left
-                return tx - textwidth - fontsize/3;
+                return tx - textwidth[i] - fontsize/3;
               } else if (group.labels.endsWith("right")){//anchored right
                 return tx - fontsize/3;
               } else {//anchored center
-                return tx - textwidth/2 - fontsize/3;
+                return tx - textwidth[i]/2 - fontsize/3;
               }
             })
             .attr('cy', function (d, i){
@@ -614,6 +566,34 @@ window.exports.viewer = (function () {
             gr.selectAll("text")
               .attr("transform", "translate(" + (fontsize*2/3) + "," + 0 + ")");
             gr.selectAll("circle")
+              .attr("transform", "translate(" + (fontsize*2/3) + "," + 0 + ")");
+          }
+        }*/
+        if(group.key){
+          var labkey = gr.append("rect")
+            .attr('width', (fontsize)/2)
+            .attr('height', (fontsize)/2)
+            .attr('x', function (d, i){
+              if (group.labels.endsWith("left")){//anchored left
+                return tx - textwidth[i] - fontsize/2;
+              } else if (group.labels.endsWith("right")){//anchored right
+                return tx - fontsize/2;
+              } else {//anchored center
+                return tx - textwidth[i]/2 - fontsize/2;
+              }
+            })
+            .attr('y', function (d, i){
+              return (group.labels.startsWith("bottom")) ? -5*fontsize/8 + ty - (fontsize-1)*i : -5*fontsize/8 + ty + (fontsize-1)*i;
+            })
+            .attr("fill", function (d, i){
+              var tt = color(i);
+              if(isNaN(tt.a)){tt.a = group.graphopacity;}
+              return "rgba("+tt.r+","+tt.g+","+tt.b+","+tt.a+")";
+            });
+          if(group.labels.endsWith("right")){
+            gr.selectAll("text")
+              .attr("transform", "translate(" + (fontsize*2/3) + "," + 0 + ")");
+            labkey
               .attr("transform", "translate(" + (fontsize*2/3) + "," + 0 + ")");
           }
         }
