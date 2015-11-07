@@ -7,6 +7,9 @@
   "scripts": {
     "start": "node --harmony index.js"
   },
+  "babel": {
+    "presets": ["es2015"]
+  },
   "dependencies": {
     "express": "^4.0.x",
     "domready": "^1.0.8",
@@ -21,6 +24,7 @@
     "url": "https://github.com/artcompiler/L201"
   },
   "devDependencies": {
-    "babel": "^5.8.21"
+    "babel": "^6.1.2",
+    "babel-preset-es2015": "^6.1.2"
   }
 }
