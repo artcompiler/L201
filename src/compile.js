@@ -442,9 +442,15 @@ let translate = (function() {
         text: ["%percent"],
       };
       if(typeof val === "string"){
-        val = JSON.parse(val);
-        if(val.error && val.error.length > 0) {
-          err = err.concat(error("Attempt to parse input returned " + val.error, node.elts[0]));
+      	try {
+        	val = JSON.parse(val);
+        }
+        catch(e){
+          err = err.concat(error("Attempt to parse JSON returned " + e, node.elts[0]));
+        } finally {
+          if(val.error && val.error.length > 0) {
+            err = err.concat(error("Attempt to parse input returned " + val.error, node.elts[0]));
+          }
         }
       }
       if(!(val instanceof Array) || !val.length ){
