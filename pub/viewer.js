@@ -82,19 +82,19 @@ window.exports.viewer = (function () {
           .tween("text", function (d, i, a){
             var iprog = d3.interpolate(0, group.progress[i]);
             var ival = d3.interpolate(0, group.current[i]);
-            var igoal = d3.interpolate(0, group.goal[i]);
+            //var igoal = d3.interpolate(group.goal[i], group.goal[i]);
             return function (t){
               if(group.text.length == 1){
                 this.textContent = group.text[0]
                   .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+group.goal[i].toFixed(group.dec[i])))
+                  .replace(/%goal/g, +group.goal[i])
                   .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
               } else {
                 this.textContent = group.text[i]
                   .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+group.goal[i].toFixed(group.dec[i])))
+                  .replace(/%goal/g, +group.goal[i])
                   .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
               }
             }
@@ -254,7 +254,7 @@ window.exports.viewer = (function () {
           .attr("d", function (d, i){
             barc = d3.svg.arc()
               .startAngle(rot)
-              .endAngle(function (d, i){return (progress[i] <= 0) ? rot : rot+ radarc;})
+              .endAngle(function (d, i){return rot + radarc;})
               .innerRadius(function (d, i){
                 if(!i){ir[i] = size-thickness;} else {
                   ir[i] = ir[i-1] - (gap+thickness);
@@ -358,7 +358,7 @@ window.exports.viewer = (function () {
           .attr("d", function (d, i){
             barc = d3.svg.arc()
               .startAngle(rot)
-              .endAngle(function (d, i){return (progress[i] <= 0) ? rot : rot+radarc;})
+              .endAngle(function (d, i){return rot+radarc;})
               .innerRadius(function (d, i){
                 if(!i){ir[i] = size-thickness;} else {
                   ir[i] = ir[i-1] - (gap+thickness);
@@ -383,7 +383,7 @@ window.exports.viewer = (function () {
           .attr("d", function (d, i){
             arcs[i] = d3.svg.arc()
               .startAngle(rot)
-              .endAngle(rot)
+              .endAngle(rot+0.00001)
               .innerRadius(function (d, i){return ir[i];})
               .outerRadius(function (d, i){return or[i];})
               .cornerRadius(group.rounding);
@@ -402,7 +402,7 @@ window.exports.viewer = (function () {
             if (ccc > 1){
               ccc = 1;
             }
-            var itp = d3.interpolate(rot, rot + (radarc)*ccc);
+            var itp = d3.interpolate(rot, rot + (radarc)*ccc + 0.00001);
 
             return function(t) {
               return arcs[i].endAngle(itp(t))(d, i);
@@ -525,19 +525,19 @@ window.exports.viewer = (function () {
           .tween("text", function (d, i, a){
             var iprog = d3.interpolate(0, group.progress[i]);
             var ival = d3.interpolate(0, group.current[i]);
-            var igoal = d3.interpolate(0, group.goal[i]);
+            //var igoal = d3.interpolate(group.goal[i], group.goal[i]);
             return function (t){
               if(group.text.length == 1){
                 this.textContent = group.text[0]
                   .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+group.goal[i].toFixed(group.dec[i])))
+                  .replace(/%goal/g, +group.goal[i])
                   .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
               } else {
                 this.textContent = group.text[i]
                   .replace(/%percent/g, +iprog(t).toFixed(group.dec[i])+'%')
-                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+(igoal(t).toFixed(group.dec[i]))))
-                  .replace(/%goal/g, +(igoal(t).toFixed(group.dec[i])))
+                  .replace(/%fraction/g, (+(ival(t).toFixed(group.dec[i]))) + "/" + (+group.goal[i].toFixed(group.dec[i])))
+                  .replace(/%goal/g, +group.goal[i])
                   .replace(/%value/g, +(ival(t).toFixed(group.dec[i])));
               }
             }
