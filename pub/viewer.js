@@ -5,7 +5,6 @@ window.gcexports.viewer = (function () {
   function update(el, obj, src, pool) {
     var bgcol = 'white';
     var group = null;
-    obj = JSON.parse(obj);
     if(!(obj.data instanceof(Array))){
       obj.data = [obj.data];//has just one element
     }
