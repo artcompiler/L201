@@ -312,7 +312,6 @@ messages[1004] = "No visitor method defined for '%1'.";
 let translate = (function() {
   let nodePool;
   function translate(pool, resume) {
-    console.log("pool=" + JSON.stringify(pool, null, 2));
     nodePool = pool;
     return visit(pool.root, {}, resume);
   };
@@ -326,7 +325,6 @@ let translate = (function() {
     assert(typeof resume === "function", message(1003));
     // Get the node from the pool of nodes.
     let node = nodePool[nid];
-    console.log("visit() nid=" + nid + " node=" + JSON.stringify(node));
     assert(node, message(1001, [nid]));
     assert(node.tag, message(1001, [nid]));
     assert(typeof table[node.tag] === "function", message(1004, [node.tag]));
@@ -420,7 +418,6 @@ let translate = (function() {
   };
   function data(node, options, resume) {//one value: an object or array thereof
     visit(node.elts[0], options, function (err, val) {
-      console.log("data() val=" + JSON.stringify(val, null, 2));
       var ret = {
         goal: [],
         current: [],
@@ -1283,12 +1280,10 @@ export let compiler = (function () {
     // an object to be rendered on the client by the viewer for this language.
     try {
       translate(pool, function (err, val) {
-        console.log("translate err=" + JSON.stringify(err, null, 2) + "\nval=" + JSON.stringify(val, null, 2));
         if (err.length) {
           resume(err, val);
         } else {
           render(val, function (err, val) {
-            console.log("render err=" + JSON.stringify(err, null, 2) + "\nval=" + JSON.stringify(val, null, 2));
             resume(err, val);
           });
         }
