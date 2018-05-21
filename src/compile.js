@@ -1275,7 +1275,7 @@ let render = (function() {
   return render;
 })();
 export let compiler = (function () {
-  exports.compile = function compile(pool, resume) {
+  exports.compile = function compile(pool, data, resume) {
     // Compiler takes an AST in the form of a node pool and translates it into
     // an object to be rendered on the client by the viewer for this language.
     try {

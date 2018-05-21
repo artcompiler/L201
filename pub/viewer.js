@@ -1,17 +1,15 @@
-/* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
-/* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright (c) 2015, Jeff Dyer, Art Compiler LLC */
 window.gcexports.viewer = (function () {
   function update(el, obj, src, pool) {
     var bgcol = 'white';
     var group = null;
-    if(!(obj.data instanceof(Array))){
-      obj.data = [obj.data];//has just one element
+    if(!(obj instanceof(Array))){
+      obj = [obj];//has just one element
     }
-    if (obj.error) {
+    if (obj[0].error) {
       str = "ERROR: " + obj.error;
     } else {
-      obj.data.forEach(function(element, index, array){
+      obj.forEach(function(element, index, array){
         if(element.goal && element.current && element.progress){
           group = element;
         } else if(element.bg){
