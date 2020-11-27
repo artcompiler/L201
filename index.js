@@ -38,7 +38,6 @@ app.post("/compile", function(req, res) {
           // Don't have compile access.
           res.sendStatus(401).send(err);
         } else {
-          console.log("POST /compile body=" + JSON.stringify(body, null, 2));
           let code = body.code;
           let data = body.data;
           let t0 = new Date;
