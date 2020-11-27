@@ -22,7 +22,7 @@ process.on('uncaughtException', function(err) {
 app.get("/version", function(req, res) {
   res.send(compiler.version || "v0.0.0");
 });
-app.get("/compile", function(req, res) {
+app.post("/compile", function(req, res) {
   let body = "";
   req.on("data", function (chunk) {
     body += chunk;
@@ -38,9 +38,9 @@ app.get("/compile", function(req, res) {
           // Don't have compile access.
           res.sendStatus(401).send(err);
         } else {
-          let code = body.src;
+          console.log("POST /compile body=" + JSON.stringify(body, null, 2));
+          let code = body.code;
           let data = body.data;
-          data.REFRESH = body.refresh; // Stowaway flag.
           let t0 = new Date;
           let obj = compiler.compile(code, data, function (err, val) {
             if (err.length) {

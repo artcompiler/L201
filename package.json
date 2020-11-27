@@ -21,7 +21,9 @@
     "url": "https://github.com/artcompiler/L201"
   },
   "babel": {
-    "presets": ["es2015"]
+    "presets": [
+      "es2015"
+    ]
   },
   "devDependencies": {
     "babel": "^6.0.x",
